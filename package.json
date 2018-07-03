@@ -6,7 +6,7 @@
     "test-server": "mocha --colors --watch --recursive './test/**/*.test.js'",
     "test": "mocha --colors --recursive './test/**/*.test.js'"
   },
-  "main": "./src/index.js",
+  "main": "./src/HtmlParser.js",
   "keywords": [
     "atlassubbed",
     "parser",
