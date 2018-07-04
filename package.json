@@ -36,5 +36,11 @@
   },
   "dependencies": {
     "atlas-seq-matcher": "^1.0.0"
+  },
+  "homepage": "https://github.com/atlassubbed/atlas-html-stream#readme",
+  "bugs": "https://github.com/atlassubbed/atlas-html-stream/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atlassubbed/atlas-html-stream.git"
   }
 }
