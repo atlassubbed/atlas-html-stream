@@ -1,11 +1,14 @@
 const SeqMatcher = require("atlas-seq-matcher");
 const { Transform } = require("stream");
-const { TEXT, NODE, NAME, KEY, VALUE, SCRIPT, STYLE } = require("./states");
+const { TEXT, NODE, NAME, KEY, VALUE, SCRIPT, STYLE, COMMENT } = require("./states");
 
 module.exports = class HtmlParser extends Transform {
   constructor(){
     super({readableObjectMode: true})
-    const endScript = SeqMatcher("</script>"), endStyle = SeqMatcher("</style>");
+    const endScript = SeqMatcher("</script>")
+    const endStyle = SeqMatcher("</style>")
+    const beginComment = SeqMatcher("!--")
+    const endComment = SeqMatcher("-->")
     let cache, name, key, text, data, state, curPos, minPos;
     let isClose, isSelfClose, hasEqual, valStartChar;
     this.reset = () => {
@@ -23,7 +26,7 @@ module.exports = class HtmlParser extends Transform {
     const flushNode = () => {
       if (!isClose) this.push({name, data})
       if (isSelfClose || isClose) this.push({name})
-      const s = name === "script" ? SCRIPT : name === "style" ? STYLE : TEXT
+      const s = name === "script" ? SCRIPT : name === "style" ? STYLE : name === "!--" ? COMMENT : TEXT
       data = {}, name = "", isClose = isSelfClose = null
       return s
     }
@@ -67,6 +70,7 @@ module.exports = class HtmlParser extends Transform {
             // found non-whitespace
             if (!name) {
               // found name start
+              beginComment.found(c)
               v = i, s = NAME
             } else if (!key) {
               // found key start
@@ -87,13 +91,16 @@ module.exports = class HtmlParser extends Transform {
           }
         } else if (s === NAME){
           // in node's name
-          if (c === 32 || c >= 9 && c <= 13) {
-            // found whitepsace, ends name
+          if (beginComment.found(c)){
+            // found comment, ends node
+            name = getCache(v, i + 1), s = flushNode(), v = i + 1
+          } else if (c === 32 || c >= 9 && c <= 13) {
+            // found whitespace, ends name
             name = getCache(v, i), s = NODE, v = i + 1
           } else if (c === 47) {
             // found /
             isSelfClose = true, name = getCache(v, i), s = NODE, v = i + 1
-          } else if (c === 62) {
+          } else if (c === 62){
             // found >, ends node
             name = getCache(v, i), s = flushNode(), v = i + 1
           }
@@ -130,6 +137,9 @@ module.exports = class HtmlParser extends Transform {
             // found /
             isSelfClose = true, flushVal(v,i), s = NODE, v = i + 1
           }
+        } else if (s === COMMENT && endComment.found(c)){
+          // found end of comment node
+          flushSpecialNode(v, i-2, "!--"), s = TEXT, v = i + 1
         } else if (s === SCRIPT && endScript.found(c)){
           // found end of script node
           flushSpecialNode(v, i-8, "script"), s = TEXT, v = i + 1

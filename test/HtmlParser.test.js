@@ -117,6 +117,22 @@ describe("HtmlParser", function(){
       done();
     })
   })
+  describe("captures comment nodes", function(){
+    theyBoth("should treat everything inside the node as raw text", "comment", function(res, done){
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({name: "!--", data: {}});
+      expect(res[1].text).to.equal('this is a comment')
+      expect(res[2]).to.deep.equal({name: "!--"})
+      done();
+    })
+    theyBoth("should keep all whitespace inside the node", "comment-ws", function(res, done){
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({name: "!--", data: {}});
+      expect(res[1].text).to.equal('\n  this\n  is\n  a\n  comment\n')
+      expect(res[2]).to.deep.equal({name: "!--"})
+      done();
+    })
+  })
   describe("captures script nodes", function(){
     theyBoth("should treat everything inside the node as raw text", "script", function(res, done){
       expect(res.length).to.equal(3);
@@ -147,6 +163,57 @@ describe("HtmlParser", function(){
       expect(res[1].text).to.equal('\n  h1 {color:red;}\n  p {color:blue;}\n  <oops this=is not=valid css="!"/>\n')
       expect(res[2]).to.deep.equal({name: "style"})
       done();
+    })
+  })
+  describe("correctly parses complete html files", function(){
+    theyBoth("should capture all the nodes", "app", function(res, done){
+      expect(res.length).to.equal(43)
+      expect(res).to.deep.equal([
+        {name: "!DOCTYPE", data: {html: ""}},
+        {name: "html", data: {}},
+        {name: "head", data: {}},
+        {name: "!--", data: {}},
+        {text: " broken link "},
+        {name: "!--"},
+        {name: "link", data: {rel: "stylesheet", type: "text/css", href: "mystyle.css"}},
+        {name: "meta", data: {name: "viewport", content: "width=device-width, initial-scale=1"}},
+        {name: "title", data: {}},
+        {text: "My App"},
+        {name: "title"},
+        {name: "style", data: {}},
+        {text: "\n      p {\n        margin: 0 auto;\n      }\n    "},
+        {name: "style"},
+        {name: "script", data: {}},
+        {text: '\n      alert("Click me!")\n    '},
+        {name: "script"},
+        {name: "head"},
+        {name: "body", data: {}},
+        {name: "h1", data: {style: "color:blue;margin-left:30px;"}},
+        {text: "My Awesome App"},
+        {name: "h1"},
+        {text: "This Is My Body"},
+        {name: "p", data: {}},
+        {text: "Paragraph 1"},
+        {name: "p"},
+        {name: "p", data: {these: ""}},
+        {text: "Trees"},
+        {name: "p", data: {are: "definitely"}},
+        {text: "Are"},
+        {name: "p", data: {invalid: ""}},
+        {text: "Cool"},
+        {name: "p", data: {attributes: "", on:"", our: "paragraph tags"}},
+        {text: "Right?"},
+        {name: "p"},
+        {name: "p"},
+        {name: "!--", data: {}},
+        {text: " \n          hello \n          world \n        "},
+        {name: "!--"},
+        {name: "p"},
+        {name: "p"},
+        {name: "body"},
+        {name: "html"}
+      ])
+      done()
     })
   })
 })

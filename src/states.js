@@ -5,5 +5,6 @@ module.exports = {
   KEY:3, 
   VALUE:4, 
   SCRIPT:5, 
-  STYLE: 6
+  STYLE: 6,
+  COMMENT: 7
 }
