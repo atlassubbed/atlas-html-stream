@@ -117,10 +117,36 @@ describe("HtmlParser", function(){
       done();
     })
   })
-  describe("ignores script nodes", function(){
-
+  describe("captures script nodes", function(){
+    theyBoth("should treat everything inside the node as raw text", "script", function(res, done){
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({name: "script", data: {}});
+      expect(res[1].text).to.equal('const c = <Component key="value"/>; const x = "hello"')
+      expect(res[2]).to.deep.equal({name: "script"})
+      done();
+    })
+    theyBoth("should keep all whitespace inside the node", "script-ws", function(res, done){
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({name: "script", data: {}});
+      expect(res[1].text).to.equal('\n  const c = <Component key="value"/>;\n  const x = "hello"\n')
+      expect(res[2]).to.deep.equal({name: "script"})
+      done();
+    })
   })
-  describe("ignores style nodes", function(){
-
+  describe("captures style nodes", function(){
+    theyBoth("should treat everything inside the node as raw text", "style", function(res, done){
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({name: "style", data: {}});
+      expect(res[1].text).to.equal('h1 {color:red;} p {color:blue;} <oops this=is not=valid css="!"/>')
+      expect(res[2]).to.deep.equal({name: "style"})
+      done();
+    })
+    theyBoth("should keep all whitespace inside the node", "style-ws", function(res, done){
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({name: "style", data: {}});
+      expect(res[1].text).to.equal('\n  h1 {color:red;}\n  p {color:blue;}\n  <oops this=is not=valid css="!"/>\n')
+      expect(res[2]).to.deep.equal({name: "style"})
+      done();
+    })
   })
 })
