@@ -167,11 +167,12 @@ describe("HtmlParser", function(){
   })
   describe("correctly parses complete html files", function(){
     theyBoth("should capture all the nodes", "app", function(res, done){
-      expect(res.length).to.equal(43)
+      expect(res.length).to.equal(45)
       expect(res).to.deep.equal([
         {name: "!DOCTYPE", data: {html: ""}},
         {name: "html", data: {}},
         {name: "head", data: {}},
+        {text: "some actual text"},
         {name: "!--", data: {}},
         {text: " broken link "},
         {name: "!--"},
@@ -208,6 +209,7 @@ describe("HtmlParser", function(){
         {name: "!--", data: {}},
         {text: " \n          hello \n          world \n        "},
         {name: "!--"},
+        {text: "some actual text"},
         {name: "p"},
         {name: "p"},
         {name: "body"},
