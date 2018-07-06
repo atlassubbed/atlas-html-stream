@@ -133,7 +133,21 @@ commentNodes.forEach(n => console.log(n));
 
 ## todo
 
+#### `parseHtml` helper
+
 Should `parseHtml` be exported from this package in addition to `HtmlParser`? Using `parseHtml` is not recommended over the streaming interface, but it seems like a valid helper for cases where the html string needs to be in memory.
+
+#### even faster
+
+I'd like to make this thing even faster. The parsing itself takes about `3.5 ms/file` (using [htmlparser-benchmark](https://github.com/AndreasMadsen/htmlparser-benchmark)) on my machine. Pushing nodes as `data` events to our stream adds around 40% more processing time, which is why the benchmark above shows around `4.9 ms/file` -- this can't be avoided, because we *want* the streaming interface. 
+
+The `SeqMatcher` slows down this parser (checking comment, script and style nodes); there might be a faster way to handle these special nodes.
+
+Switching on the `state` of the parser first is probably faster than switching on the current character first, but I haven't tested the latter. The main idea is to minimize the amount of instructions required for each `[state, char]` pair, according to how likely each `[state, char]` pair is. If `[TEXT, !whitespace]` has the highest probability in "typical" html, then we would want this pair to require the least amount of instructions. In other words `sum_i(probabilityOfPair_i*numSteps_i)` should be minimized.
+
+#### dynamic parser idea
+
+What defines a "typical" html document? A set of parsing instructions for a "typical" html document may be slower for "atypical" html documents which have a vastly different `probabilityOfPair_i` distribution. What if the parser could use the distribution of pairs of the current document to dynamically change its condition-tree on-the-fly? For example, if we're getting overwhelmed by raw text, it would be faster to check if the state is `TEXT` first. Alternatively, if our document has almost *no* raw text, it would be smarter to check if the state is `TEXT` last. While the dynamic parser sounds interesting, it may not be worth implementing if it adds a ton of overhead.
 
 ## caveats
 
