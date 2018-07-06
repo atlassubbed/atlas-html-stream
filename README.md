@@ -6,6 +6,12 @@ A super fast html-parser stream that outputs tag, text and closing nodes.
 
 ---
 
+## install 
+
+```
+npm install --save atlas-html-stream
+```
+
 ## why
 
 I didn't like htmlparser2's streaming API and I wanted an html parser that collpased whitespace by default. I also wanted to see if I could write a faster parser. 
