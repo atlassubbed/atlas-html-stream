@@ -131,6 +131,10 @@ commentNodes.forEach(n => console.log(n));
 // { name: '!--' }
 ```
 
+## todo
+
+Should `parseHtml` be exported from this package in addition to `HtmlParser`? Using `parseHtml` is not recommended over the streaming interface, but it seems like a valid helper for cases where the html string needs to be in memory.
+
 ## caveats
 
 #### large text nodes
