@@ -218,4 +218,38 @@ describe("HtmlParser", function(){
       done()
     })
   })
+  describe("correctly cleans up state", function(){
+    it("should not flush pending text if the stream hasn't ended", function(){
+      let calledData = 0;
+      const parser = new HtmlParser();
+      parser.on("data", data => calledData++);
+      parser.write("some pending text");
+      expect(calledData).to.equal(0);
+    })
+    it("should flush pending text if the stream was ended", function(){
+      let calledData = 0;
+      const parser = new HtmlParser();
+      parser.on("data", data => {
+        calledData++;
+        expect(data.text).to.equal("some pending text")
+      });
+      parser.end("some pending text");
+      expect(calledData).to.equal(1);
+    })
+    it("should forget a pending node if reset is called", function(){
+      let calledData = 0;
+      const parser = new HtmlParser();
+      parser.on("data", data => {
+        if (++calledData === 1){
+          expect(data.text).to.equal("some text")
+        } else { 
+          expect(data.name).to.equal("p")
+        }
+      })
+      parser.write("<di")
+      parser.reset();
+      parser.write("some text <p>")
+      expect(calledData).to.equal(2)
+    })
+  })
 })
