@@ -102,13 +102,13 @@ The examples above show you how minimal the API is, as it should be. Comment, sc
 ```javascript
 ...
 const scriptNodes = parseHtml(`
-<script src="./script.js">
-  const myVar = 5;
-</script>
+  <script src="./script.js">
+    const myVar = 5;
+  </script>
 `);
 scriptNodes.forEach(n => console.log(n))
 // { name: 'script', data: { src: './script.js' } }
-// { text: '\n  const myVar = 5;\n' }
+// { text: '\n    const myVar = 5;\n  ' }
 // { name: 'script' }
 ```
 
