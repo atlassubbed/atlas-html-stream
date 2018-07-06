@@ -143,7 +143,7 @@ I'd like to make this thing even faster. The parsing itself takes about `3.5 ms/
 
 The `SeqMatcher` slows down this parser (checking comment, script and style nodes); there might be a faster way to handle these special nodes.
 
-Switching on the `state` of the parser first is probably faster than switching on the current character first, but I haven't tested the latter. The main idea is to minimize the amount of instructions required for each `[state, char]` pair, according to how likely each `[state, char]` pair is. If `[TEXT, !whitespace]` has the highest probability in "typical" html, then we would want this pair to require the least amount of instructions. In other words `sum_i(probabilityOfPair_i*numSteps_i)` should be minimized.
+Switching on the `state` of the parser first is probably faster than switching on the current character first, but I haven't tested the latter. The main idea is to minimize the amount of instructions required for each `[state, char]` pair, according to how likely each pair is. If `[TEXT, !whitespace]` has the highest probability in "typical" html, then we would want this pair to require the least amount of instructions. In other words, `sum_i(probabilityOfPair_i*numSteps_i)` should be minimized.
 
 #### dynamic parser idea
 
