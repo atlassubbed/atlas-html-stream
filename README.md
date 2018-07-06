@@ -50,6 +50,7 @@ myHtmlFile.pipe(new HtmlParser()).on("data", ({name, data, text}) => {
     // is a text node
     console.log(text);
   } else if (name && data){
+    // is an opening tag with potential attributes
     console.log(name, data)
   } else {
     // is a closing tag
