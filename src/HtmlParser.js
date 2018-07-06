@@ -12,7 +12,7 @@ module.exports = class HtmlParser extends Transform {
     let cache, name, key, text, data, state, curPos, minPos;
     let isClose, isSelfClose, hasEqual, valStartChar;
     this.reset = () => {
-      endStyle.reset(), endScript.reset();
+      endStyle.reset(), endScript.reset(), endComment.reset(), beginComment.reset();
       state = TEXT, data = {}, text = [], name = cache = key = "";
       curPos = minPos = 0;
       isClose = isSelfClose = hasEqual = valStartChar = null;
