@@ -20,7 +20,6 @@ module.exports = class HtmlParser extends Transform {
     this.reset();
     this.cache = chunk => (cache+=chunk).length;
     const getCache = (start, end) => cache.substr(start, end-start);
-    const clearCache = () => (cache = cache.substr(minPos), curPos -= minPos, minPos = 0);
     const flushKey = (v, i) => (key = data[key || cache.substr(v, i-v)] = "")
     const flushVal = (v, i) => (data[key] = cache.substr(v, i-v), key = "", valStartChar = hasEqual = null)
     const flushNode = () => {
@@ -33,6 +32,7 @@ module.exports = class HtmlParser extends Transform {
     const flushSpecialNode = (v, i, name) => {
       const text = cache.substr(v, i-v)
       text && this.push({text}), this.push({name})
+      return TEXT
     }
     const flushText = (v, i) => {
       if (v < i) {
@@ -50,106 +50,66 @@ module.exports = class HtmlParser extends Transform {
       while (i < cacheLen){
         c = cache.charCodeAt(i)
         if (s === TEXT){
-          // in text
-          if (c === 32 || c >= 9 && c <= 13) {
-            // found whitespace
+          if (c === 32 || c >= 9 && c <= 13) // ws
             v < i && text.push(getCache(v, i)), v = i + 1
-          } else if (c === 60) {
-            // found open tag <
+          else if (c === 60) // <
             flushText(v, i), s = NODE, v = i + 1
-          }
         } else if (s === NODE){
-          // in a node
-          if (c === 62) {
-            // found closing tag >
+          if (c === 62) // >
             key && flushKey(), s = flushNode(), v = i + 1
-          } else if (c === 47) {
-            // found /
+          else if (c === 47) // /
             isClose = !(isSelfClose = !!name)
-          } else if (c !== 32 && (c < 9 || c > 13)){
-            // found non-whitespace
-            if (!name) {
-              // found name start
-              beginComment.found(c)
-              v = i, s = NAME
-            } else if (!key) {
-              // found key start
+          else if (c !== 32 && (c < 9 || c > 13)){ // !ws
+            if (!name) // name start
+              beginComment.found(c), v = i, s = NAME
+            else if (!key) // key start
               v = i, s = KEY
-            } else if (c === 61) {
-              // found = after key
+            else if (c === 61) // =
               hasEqual = true
-            } else if (!hasEqual) {
-              // found start of next key
+            else if (!hasEqual) // next key
               flushKey(), v = i, s = KEY
-            } else if (c === 34 || c === 39) {
-              // found start of quoted value
+            else if (c === 34 || c === 39) // ', "
               v = i + 1, valStartChar = c, s = VALUE
-            } else {
-              // found start of un-quoted value
+            else // un-quoted val
               v = i, s = VALUE
-            }
           }
         } else if (s === NAME){
-          // in node's name
-          if (beginComment.found(c)){
-            // found comment, ends node
+          if (beginComment.found(c)) // start comment
             name = getCache(v, i + 1), s = flushNode(), v = i + 1
-          } else if (c === 32 || c >= 9 && c <= 13) {
-            // found whitespace, ends name
+          else if (c === 32 || c >= 9 && c <= 13) // ws
             name = getCache(v, i), s = NODE, v = i + 1
-          } else if (c === 47) {
-            // found /
+          else if (c === 47) // /
             isSelfClose = true, name = getCache(v, i), s = NODE, v = i + 1
-          } else if (c === 62){
-            // found >, ends node
+          else if (c === 62) // >
             name = getCache(v, i), s = flushNode(), v = i + 1
-          }
         } else if (s === KEY){
-          // in node's key
-          if (c === 32 || c >= 9 && c <= 13) {
-            // found whitespace, ends key
+          if (c === 32 || c >= 9 && c <= 13) // ws
             key = getCache(v, i), s = NODE, v = i + 1
-          } else if (c === 61) {
-            // found =, ends key
+          else if (c === 61) // =
             hasEqual = true, key = getCache(v, i), s = NODE, v = i + 1
-          } else if (c === 47) {
-            // found /
+          else if (c === 47) // /
             isSelfClose = true, key = getCache(v, i), s = NODE, v = i + 1
-          } else if (c === 62) {
-            // found >, ends node
+          else if (c === 62) // >
             flushKey(v,i), s = flushNode(), v = i + 1
-          }
         } else if (s === VALUE){
-          // in node's current key's value
           if (valStartChar != null){
-            // is a quoted value
-            if (c === valStartChar) {
-              // found end of quoted value
+            if (c === valStartChar) // found end quote
               flushVal(v,i), s = NODE, v = i + 1
-            }
-          } else if (c === 32 || c >= 9 && c <= 13) {
-            // found whitespace, ends un-quoted value
+          } else if (c === 32 || c >= 9 && c <= 13) // ws
             flushVal(v,i), s = NODE, v = i + 1
-          } else if (c === 62) {
-            // found >, ends value and node
+          else if (c === 62) // >
             flushVal(v,i), s = flushNode(), v = i + 1
-          } else if (c === 47) {
-            // found /
+          else if (c === 47) // /
             isSelfClose = true, flushVal(v,i), s = NODE, v = i + 1
-          }
-        } else if (s === COMMENT && endComment.found(c)){
-          // found end of comment node
-          flushSpecialNode(v, i-2, "!--"), s = TEXT, v = i + 1
-        } else if (s === SCRIPT && endScript.found(c)){
-          // found end of script node
-          flushSpecialNode(v, i-8, "script"), s = TEXT, v = i + 1
-        } else if (s === STYLE && endStyle.found(c)){
-          // found end of style node
-          flushSpecialNode(v, i-7, "style"), s = TEXT, v = i + 1
-        }
+        } else if (s === COMMENT && endComment.found(c))
+          s = flushSpecialNode(v, i-2, "!--"), v = i + 1
+        else if (s === SCRIPT && endScript.found(c))
+          s = flushSpecialNode(v, i-8, "script"), v = i + 1
+        else if (s === STYLE && endStyle.found(c))
+          s = flushSpecialNode(v, i-7, "style"), v = i + 1
         i = i + 1
       }
-      curPos = i, minPos = v, state = s, clearCache()
+      cache = cache.substr(v), curPos = i - v, minPos = 0, state = s;
     }
   }
   _transform(chunk, encoding, done){
