@@ -151,7 +151,7 @@ The `SeqMatcher` slows down this parser (checking comment, script and style node
 
 Switching on the `state` of the parser first is probably faster than switching on the current character first, but I haven't tested the latter. The main idea is to minimize the amount of instructions required for each `[state, char]` pair, according to how likely each pair is. If `[TEXT, !whitespace]` has the highest probability in "typical" html, then we would want this pair to require the least amount of instructions. In other words, `sum_i(probabilityOfPair_i*numSteps_i)` should be minimized.
 
-I think collapsing the states `SCRIPT`, `STYLE` and `COMMENT` into a single state `SPECIAL` might improve the performance. Instead of polluting the space with `SeqMatchers` for each one initially, we can create them on-the-fly for whichever `SPECIAL` node we are parsing.
+I think collapsing the states `SCRIPT`, `STYLE` and `COMMENT` into a single state `SPECIAL` might improve the performance. Instead of polluting the space with `SeqMatchers` for each one initially, we can create them on-demand for whichever `SPECIAL` node we are parsing, and store them in a persistent hash in case we see the same `SPECIAL` node again.
 
 #### dynamic parser idea
 
