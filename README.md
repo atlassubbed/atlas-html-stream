@@ -151,6 +151,8 @@ The `SeqMatcher` slows down this parser (checking comment, script and style node
 
 Switching on the `state` of the parser first is probably faster than switching on the current character first, but I haven't tested the latter. The main idea is to minimize the amount of instructions required for each `[state, char]` pair, according to how likely each pair is. If `[TEXT, !whitespace]` has the highest probability in "typical" html, then we would want this pair to require the least amount of instructions. In other words, `sum_i(probabilityOfPair_i*numSteps_i)` should be minimized.
 
+I think collapsing the states `SCRIPT`, `STYLE` and `COMMENT` into a single state `SPECIAL` might improve the performance. Instead of polluting the space with `SeqMatchers` for each one initially, we can create them on-the-fly for whichever `SPECIAL` node we are parsing.
+
 #### dynamic parser idea
 
 What defines a "typical" html document? A set of parsing instructions for a "typical" html document may be slower for "atypical" html documents which have a vastly different `probabilityOfPair_i` distribution. What if the parser could use the distribution of pairs of the current document to dynamically change its condition-tree on-the-fly? For example, if we're getting overwhelmed by raw text, it would be faster to check if the state is `TEXT` first. Alternatively, if our document has almost *no* raw text, it would be smarter to check if the state is `TEXT` last. While the dynamic parser sounds interesting, it may not be worth implementing if it adds a ton of overhead.
