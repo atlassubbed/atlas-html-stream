@@ -3,8 +3,9 @@ const { Transform } = require("stream");
 const { TEXT, NODE, NAME, KEY, VALUE, SCRIPT, STYLE, COMMENT } = require("./states");
 
 module.exports = class HtmlParser extends Transform {
-  constructor(){
+  constructor(options = {preserveNbsp: false}){
     super({readableObjectMode: true})
+    const preserveNbsp = options && options.preserveNbsp
     const endScript = SeqMatcher("</script>")
     const endStyle = SeqMatcher("</style>")
     const beginComment = SeqMatcher("!--")
@@ -50,7 +51,9 @@ module.exports = class HtmlParser extends Transform {
       while (i < cacheLen){
         c = cache.charCodeAt(i)
         if (s === TEXT){
-          if (c === 32 || c >= 9 && c <= 13) // ws
+          if ( c === 32 && !preserveNbsp)
+            v < i && text.push(getCache(v, i)), v = i + 1
+          else if (c >= 9 && c <= 13) // ws
             v < i && text.push(getCache(v, i)), v = i + 1
           else if (c === 60) // <
             flushText(v, i), s = NODE, v = i + 1

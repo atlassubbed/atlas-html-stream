@@ -242,7 +242,7 @@ describe("HtmlParser", function(){
       parser.on("data", data => {
         if (++calledData === 1){
           expect(data.text).to.equal("some text")
-        } else { 
+        } else {
           expect(data.name).to.equal("p")
         }
       })
@@ -252,4 +252,71 @@ describe("HtmlParser", function(){
       expect(calledData).to.equal(2)
     })
   })
+  describe("preserve non-breaking space option", () => {
+    it("preserve spaces when in text", function(){
+      let calledData = "";
+      const parser = new HtmlParser({preserveNbsp: true});
+      parser.on("data", data => {
+        if (data.text) calledData += data.text;
+      });
+      parser.end("Title: <b> Jan  Bananberg</b>");
+      expect(calledData).to.equal("Title:  Jan  Bananberg");
+    })
+    it("preserve spaces when in text across chunks", function(){
+      let calledData = "";
+      const parser = new HtmlParser({preserveNbsp: true});
+      parser.on("data", data => {
+        if (data.text) calledData += data.text;
+      });
+      parser.write("Title: ");
+      parser.write("<b> Jan");
+      parser.write(" Bananb");
+      parser.end("erg</b>");
+      expect(calledData).to.equal("Title:  Jan Bananberg");
+    })
+    it("still ignores other whitespace chars when in text", function(){
+      let calledData = "";
+      const parser = new HtmlParser({preserveNbsp: true});
+      parser.on("data", data => {
+        if (data.text) calledData += data.text;
+      });
+      parser.end("Title:\r\n<b> Jan Bananberg</b>");
+      expect(calledData).to.equal("Title: Jan Bananberg");
+    })
+    it("still ignores other whitespace chars when in text across chunks", function(){
+      let calledData = "";
+      const parser = new HtmlParser({preserveNbsp: true});
+      parser.on("data", data => {
+        if (data.text) calledData += data.text;
+      });
+      parser.write("Title:\r");
+      parser.write("\n<b> Ja");
+      parser.write("n Banan");
+      parser.write("berg</b");
+      parser.end(">");
+      expect(calledData).to.equal("Title: Jan Bananberg");
+    })
+    it("does not affect spaces when in html node", function(){
+      let calledData = 0;
+      const parser = new HtmlParser({preserveNbsp: true});
+      parser.on("data", data => {
+        calledData++;
+        expect(data.name).to.equal("some")
+        expect(data.data).to.eql({pending: "", text: ""})
+      });
+      parser.end("< some   \r\npending \r\ntext >");
+      expect(calledData).to.equal(1);
+    })
+    it("keeps spaces in node attribute", function(){
+      let calledData = 0;
+      const parser = new HtmlParser({preserveNbsp: true});
+      parser.on("data", data => {
+        calledData++;
+        expect(data.name).to.equal("some")
+        expect(data.data).to.eql({pending: "{\"text\":\"  my text\"}"})
+      });
+      parser.end(`<some pending='${JSON.stringify({text: "  my text"})}'>`);
+      expect(calledData).to.equal(1);
+    })
+  });
 })
