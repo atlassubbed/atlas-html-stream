@@ -3,9 +3,8 @@ const { Transform } = require("stream");
 const { TEXT, NODE, NAME, KEY, VALUE, SCRIPT, STYLE, COMMENT } = require("./states");
 
 module.exports = class HtmlParser extends Transform {
-  constructor(options = {preserveNbsp: false}){
+  constructor({preserveNbsp} = {preserveNbsp: false}){
     super({readableObjectMode: true})
-    const preserveNbsp = options && options.preserveNbsp
     const endScript = SeqMatcher("</script>")
     const endStyle = SeqMatcher("</style>")
     const beginComment = SeqMatcher("!--")
