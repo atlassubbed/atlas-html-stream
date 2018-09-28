@@ -253,7 +253,7 @@ describe("HtmlParser", function(){
     })
   })
   describe("preserve non-breaking space option", () => {
-    it("preserve spaces when in text", function(){
+    it("should preserve spaces when in text", function(){
       let calledData = "";
       const parser = new HtmlParser({preserveNbsp: true});
       parser.on("data", data => {
@@ -262,7 +262,7 @@ describe("HtmlParser", function(){
       parser.end("Title: <b> Jan  Bananberg</b>");
       expect(calledData).to.equal("Title:  Jan  Bananberg");
     })
-    it("preserve spaces when in text across chunks", function(){
+    it("should preserve spaces when in text across chunks", function(){
       let calledData = "";
       const parser = new HtmlParser({preserveNbsp: true});
       parser.on("data", data => {
@@ -274,7 +274,7 @@ describe("HtmlParser", function(){
       parser.end("erg</b>");
       expect(calledData).to.equal("Title:  Jan Bananberg");
     })
-    it("still ignores other whitespace chars when in text", function(){
+    it("should still ignore other whitespace chars when in text", function(){
       let calledData = "";
       const parser = new HtmlParser({preserveNbsp: true});
       parser.on("data", data => {
@@ -283,7 +283,7 @@ describe("HtmlParser", function(){
       parser.end("Title:\r\n<b> Jan Bananberg</b>");
       expect(calledData).to.equal("Title: Jan Bananberg");
     })
-    it("still ignores other whitespace chars when in text across chunks", function(){
+    it("should still ignore other whitespace chars when in text across chunks", function(){
       let calledData = "";
       const parser = new HtmlParser({preserveNbsp: true});
       parser.on("data", data => {
@@ -296,7 +296,7 @@ describe("HtmlParser", function(){
       parser.end(">");
       expect(calledData).to.equal("Title: Jan Bananberg");
     })
-    it("does not affect spaces when in html node", function(){
+    it("should not affect spaces when in html node", function(){
       let calledData = 0;
       const parser = new HtmlParser({preserveNbsp: true});
       parser.on("data", data => {
@@ -307,7 +307,7 @@ describe("HtmlParser", function(){
       parser.end("< some   \r\npending \r\ntext >");
       expect(calledData).to.equal(1);
     })
-    it("keeps spaces in node attribute", function(){
+    it("should keep spaces in node attribute", function(){
       let calledData = 0;
       const parser = new HtmlParser({preserveNbsp: true});
       parser.on("data", data => {
