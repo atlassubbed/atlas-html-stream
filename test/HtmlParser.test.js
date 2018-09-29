@@ -270,9 +270,9 @@ describe("HtmlParser", function(){
       });
       parser.write("Title: ");
       parser.write("<b> Jan");
-      parser.write(" Bananb");
+      parser.write("  Bananb");
       parser.end("erg</b>");
-      expect(calledData).to.equal("Title:  Jan Bananberg");
+      expect(calledData).to.equal("Title:  Jan  Bananberg");
     })
     it("should still ignore other whitespace chars when in text", function(){
       let calledData = "";
@@ -280,8 +280,8 @@ describe("HtmlParser", function(){
       parser.on("data", data => {
         if (data.text) calledData += data.text;
       });
-      parser.end("Title:\r\n<b> Jan Bananberg</b>");
-      expect(calledData).to.equal("Title: Jan Bananberg");
+      parser.end("Title:\r\n<b> Jan \r\n\t Bananberg</b>");
+      expect(calledData).to.equal("Title: Jan  Bananberg");
     })
     it("should still ignore other whitespace chars when in text across chunks", function(){
       let calledData = "";
@@ -290,11 +290,11 @@ describe("HtmlParser", function(){
         if (data.text) calledData += data.text;
       });
       parser.write("Title:\r");
-      parser.write("\n<b> Ja");
-      parser.write("n Banan");
+      parser.write("\n<b> Jan \r");
+      parser.write("\n\t Banan");
       parser.write("berg</b");
       parser.end(">");
-      expect(calledData).to.equal("Title: Jan Bananberg");
+      expect(calledData).to.equal("Title: Jan  Bananberg");
     })
     it("should not affect spaces when in html node", function(){
       let calledData = 0;
