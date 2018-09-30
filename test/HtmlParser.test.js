@@ -2,7 +2,7 @@ const { describe, it } = require("mocha")
 const { expect } = require("chai")
 const { Transform } = require("stream");
 const HtmlParser = require("../src/HtmlParser");
-const { parse, theyBoth } = require("./helpers");
+const { parse, theyBoth, theyBothWithPreserveWSOption } = require("./helpers");
 
 describe("HtmlParser", function(){
   it("should create an instance of a stream Transform", function(){
@@ -252,40 +252,93 @@ describe("HtmlParser", function(){
       expect(calledData).to.equal(2)
     })
   })
-  describe("preserve non-breaking space option", () => {
-    it("should preserve spaces when in text", function(){
-      let calledData = "";
-      const parser = new HtmlParser({preserveNbsp: true});
-      parser.on("data", data => {
-        if (data.text) calledData += data.text;
-      });
-      parser.end("Title: <b> Jan  Bananberg</b>");
-      expect(calledData).to.equal("Title:  Jan  Bananberg");
+  describe("preserve whitespace option", () => {
+    theyBothWithPreserveWSOption("should preserve whitespace in raw text", "text", true, function(res, done){
+      expect(res.length).to.equal(1);
+      expect(res[0].text).to.contain("\n");
+      expect(res[0].text).to.contain("  ");
+      done();
     })
-    it("should preserve spaces when in text across chunks", function(){
-      let calledData = "";
-      const parser = new HtmlParser({preserveNbsp: true});
-      parser.on("data", data => {
-        if (data.text) calledData += data.text;
-      });
-      parser.write("Title: ");
-      parser.write("<b> Jan");
-      parser.write("  Bananb");
-      parser.end("erg</b>");
-      expect(calledData).to.equal("Title:  Jan  Bananberg");
+    theyBothWithPreserveWSOption("should capture all the nodes and whitespaces", "app", true, function(res, done){
+      expect(res.length).to.equal(62)
+      expect(res).to.eql([
+        {name: "!DOCTYPE", data: {html: ""}},
+        {text: "\n"},
+        {name: "html", data: {}},
+        {text: "\n  "},
+        {name: "head", data: {}},
+        {text: "\n    some actual text" },
+        {name: "!--", data: {} },
+        {text: " broken link " },
+        {name: "!--" },
+        {text: "\n    " },
+        {name: "link", data: {rel: "stylesheet", type: "text/css", href: "mystyle.css"}},
+        {text: "\n    "},
+        {name: "meta", data: {name: "viewport", content: "width=device-width, initial-scale=1"}},
+        {text: "\n    "},
+        {name: 'title', data: {} },
+        {text: "\n      My App\n    "},
+        {name: "title" },
+        {text: "\n    "},
+        {name: "style", data: {}},
+        {text: "\n      p {\n        margin: 0 auto;\n      }\n    "},
+        {name: "style"},
+        {text: "\n    "},
+        {name: "script", data: {}},
+        {text: '\n      alert("Click me!")\n    '},
+        {name: "script"},
+        {text: "\n  "},
+        {name: "head"},
+        {text: "\n  "},
+        {name: 'body', data: {}},
+        {text: "\n    "},
+        {name: "h1", data: {style: "color:blue;margin-left:30px;"}},
+        {text: "My Awesome App"},
+        {name: "h1"},
+        {text: "\n    This\n    Is\n    My\n    Body\n    "},
+        {name: "p", data: {}},
+        {text: "Paragraph 1"},
+        {name: "p"},
+        {text: "\n    "},
+        {name: "p", data: {these: ""}},
+        {text: "Trees\n      "},
+        {name: "p", data: {are: "definitely"}},
+        {text: "Are\n        "},
+        {name: "p", data: {invalid: ""}},
+        {text: 'Cool\n          ' },
+        {name: "p", data: {attributes: "", on:"", our: "paragraph tags"}},
+        {text: 'Right?\n          ' },
+        {name: "p" },
+        {text: "\n        "},
+        {name: "p"},
+        {text: "\n        "},
+        {name: "!--", data: {}},
+        {text: " \n          hello \n          world \n        "},
+        {name: "!--"},
+        {text: "some actual text\n      "},
+        {name: "p"},
+        {text: "\n    "},
+        {name: "p"},
+        {text: "\n  "},
+        {name: "body"},
+        {text: "\n"},
+        {name: "html"},
+        {text: "\n"}
+      ])
+      done()
     })
-    it("should still ignore other whitespace chars when in text", function(){
+    it("should preserve all whitespace chars in text", function(){
       let calledData = "";
-      const parser = new HtmlParser({preserveNbsp: true});
+      const parser = new HtmlParser({preserveWS: true});
       parser.on("data", data => {
         if (data.text) calledData += data.text;
       });
       parser.end("Title:\r\n<b> Jan \r\n\t Bananberg</b>");
-      expect(calledData).to.equal("Title: Jan  Bananberg");
+      expect(calledData).to.equal("Title:\r\n Jan \r\n\t Bananberg");
     })
-    it("should still ignore other whitespace chars when in text across chunks", function(){
+    it("should preserve all whitespace chars in text across chunks", function(){
       let calledData = "";
-      const parser = new HtmlParser({preserveNbsp: true});
+      const parser = new HtmlParser({preserveWS: true});
       parser.on("data", data => {
         if (data.text) calledData += data.text;
       });
@@ -294,29 +347,17 @@ describe("HtmlParser", function(){
       parser.write("\n\t Banan");
       parser.write("berg</b");
       parser.end(">");
-      expect(calledData).to.equal("Title: Jan  Bananberg");
+      expect(calledData).to.equal("Title:\r\n Jan \r\n\t Bananberg");
     })
-    it("should not affect spaces when in html node", function(){
-      let calledData = 0;
-      const parser = new HtmlParser({preserveNbsp: true});
-      parser.on("data", data => {
-        calledData++;
-        expect(data.name).to.equal("some")
-        expect(data.data).to.eql({pending: "", text: ""})
-      });
-      parser.end("< some   \r\npending \r\ntext >");
-      expect(calledData).to.equal(1);
-    })
-    it("should keep spaces in node attribute", function(){
-      let calledData = 0;
-      const parser = new HtmlParser({preserveNbsp: true});
-      parser.on("data", data => {
-        calledData++;
-        expect(data.name).to.equal("some")
-        expect(data.data).to.eql({pending: "{\"text\":\"  my text\"}"})
-      });
-      parser.end(`<some pending='${JSON.stringify({text: "  my text"})}'>`);
-      expect(calledData).to.equal(1);
+    theyBothWithPreserveWSOption("should ignore malformatted space around names of open/close tags", "name-ws", true, function(res, done){
+      expect(res).to.eql([
+        {text: "        "},
+        {name: "some-name", data: {}},
+        {text: " \n\n  "},
+        {name: "some-name"},
+        {text: "\n\n"}
+      ]);
+      done()
     })
   });
 })
