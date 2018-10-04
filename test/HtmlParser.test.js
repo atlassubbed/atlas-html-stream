@@ -327,27 +327,14 @@ describe("HtmlParser", function(){
       ])
       done()
     })
-    it("should preserve all whitespace chars in text", function(){
-      let calledData = "";
-      const parser = new HtmlParser({preserveWS: true});
-      parser.on("data", data => {
-        if (data.text) calledData += data.text;
-      });
-      parser.end("Title:\r\n<b> Jan \r\n\t Bananberg</b>");
-      expect(calledData).to.equal("Title:\r\n Jan \r\n\t Bananberg");
-    })
-    it("should preserve all whitespace chars in text across chunks", function(){
-      let calledData = "";
-      const parser = new HtmlParser({preserveWS: true});
-      parser.on("data", data => {
-        if (data.text) calledData += data.text;
-      });
-      parser.write("Title:\r");
-      parser.write("\n<b> Jan \r");
-      parser.write("\n\t Banan");
-      parser.write("berg</b");
-      parser.end(">");
-      expect(calledData).to.equal("Title:\r\n Jan \r\n\t Bananberg");
+    theyBothWithPreserveWSOption("should preserve all whitespace chars in text", "regular-ws", true, function(res, done){
+      expect(res).to.eql([
+        {text: "Title:\t\n"},
+        {name: "b", data: {}},
+        {text: " Jan \t\n\t Bananberg"},
+        {name: "b"}
+      ])
+      done();
     })
     theyBothWithPreserveWSOption("should ignore malformatted space around names of open/close tags", "name-ws", true, function(res, done){
       expect(res).to.eql([
