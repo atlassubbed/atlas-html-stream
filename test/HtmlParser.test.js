@@ -332,7 +332,8 @@ describe("HtmlParser", function(){
         {text: "Title:\t\n"},
         {name: "b", data: {}},
         {text: " Jan \t\n\t Bananberg"},
-        {name: "b"}
+        {name: "b"},
+        {text: "\n"}
       ])
       done();
     })

@@ -137,7 +137,7 @@ commentNodes.forEach(n => console.log(n));
 // { name: '!--' }
 ```
 
-### whitespace
+### keeping whitespace
 
 By default, the parser will collapse all non-script/style/comment whitespace down to a single space, which is useful if you're scraping and don't care about whitespace. In some cases, you need the whitespace. You can pass a `preserveWS` option to the constructor, which will force the parser to keep all whitespace it finds in text nodes:
 
@@ -150,11 +150,11 @@ const nodes = parseHtml(`
           </b>  
 `)
 nodes.forEach(n => console.log(n));
-// { name: "text", data: "\n  This is some text\n\n      " }
+// { text: "\n  This is some text\n\n      " }
 // { name: "b", data: {} }
-// { name: "text", data: " \n        Hola\n          " }
+// { text: " \n        Hola\n          " }
 // { name: "b" }
-// { name: "text", data: "  \n" }
+// { text: "  \n" }
 ```
 
 You can then post-process the nodes if you need more specificity. Note that this example doesn't use a streaming interface for simplicity, however, the streaming interface is highly recommended:
