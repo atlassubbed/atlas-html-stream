@@ -137,6 +137,32 @@ commentNodes.forEach(n => console.log(n));
 // { name: '!--' }
 ```
 
+### keeping whitespace
+
+By default, the parser will collapse all non-script/style/comment whitespace down to a single space, which is useful if you're scraping and don't care about whitespace. In some cases, you need the whitespace. You can pass a `preserveWS` option to the constructor, which will force the parser to keep all whitespace it finds in text nodes:
+
+```javascript
+const nodes = parseHtml(`
+  This is some text
+
+      <b> 
+        Hola
+          </b>  
+`)
+nodes.forEach(n => console.log(n));
+// { text: "\n  This is some text\n\n      " }
+// { name: "b", data: {} }
+// { text: " \n        Hola\n          " }
+// { name: "b" }
+// { text: "  \n" }
+```
+
+You can then post-process the nodes if you need more specificity. Note that this example doesn't use a streaming interface for simplicity, however, the streaming interface is highly recommended:
+
+`myFile.pipe(new HtmlParser({preserveWS: true})).pipe(myTransform).on("data", node => {...})`
+
+`myTransform` can conditionally check text nodes and post-process them one-by-one.
+
 ## todo
 
 #### `parseHtml` helper
