@@ -26,16 +26,12 @@
     "chai": "^4.1.2",
     "mocha": "^5.2.0"
   },
-  "os": [
-    "darwin",
-    "linux"
-  ],
   "engines": {
     "node": "^10.1.0",
     "npm": "^6.0.1"
   },
   "dependencies": {
-    "atlas-seq-matcher": "^1.0.0"
+    "atlas-seq-matcher": "^1.0.2"
   },
   "homepage": "https://github.com/atlassubbed/atlas-html-stream#readme",
   "bugs": "https://github.com/atlassubbed/atlas-html-stream/issues",
