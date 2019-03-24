@@ -3,6 +3,7 @@ const { expect } = require("chai")
 const { Transform } = require("stream");
 const HtmlParser = require("../src/HtmlParser");
 const { parse, theyBoth, theyBothWithPreserveWSOption } = require("./helpers");
+const { EOL } = require("os");
 
 describe("HtmlParser", function(){
   it("should create an instance of a stream Transform", function(){
@@ -128,7 +129,7 @@ describe("HtmlParser", function(){
     theyBoth("should keep all whitespace inside the node", "comment-ws", function(res, done){
       expect(res.length).to.equal(3);
       expect(res[0]).to.deep.equal({name: "!--", data: {}});
-      expect(res[1].text).to.equal('\n  this\n  is\n  a\n  comment\n')
+      expect(res[1].text).to.equal(`${EOL}  this${EOL}  is${EOL}  a${EOL}  comment${EOL}`)
       expect(res[2]).to.deep.equal({name: "!--"})
       done();
     })
@@ -144,7 +145,7 @@ describe("HtmlParser", function(){
     theyBoth("should keep all whitespace inside the node", "script-ws", function(res, done){
       expect(res.length).to.equal(3);
       expect(res[0]).to.deep.equal({name: "script", data: {}});
-      expect(res[1].text).to.equal('\n  const c = <Component key="value"/>;\n  const x = "hello"\n')
+      expect(res[1].text).to.equal(`${EOL}  const c = <Component key="value"/>;${EOL}  const x = "hello"${EOL}`)
       expect(res[2]).to.deep.equal({name: "script"})
       done();
     })
@@ -160,7 +161,7 @@ describe("HtmlParser", function(){
     theyBoth("should keep all whitespace inside the node", "style-ws", function(res, done){
       expect(res.length).to.equal(3);
       expect(res[0]).to.deep.equal({name: "style", data: {}});
-      expect(res[1].text).to.equal('\n  h1 {color:red;}\n  p {color:blue;}\n  <oops this=is not=valid css="!"/>\n')
+      expect(res[1].text).to.equal(`${EOL}  h1 {color:red;}${EOL}  p {color:blue;}${EOL}  <oops this=is not=valid css="!"/>${EOL}`)
       expect(res[2]).to.deep.equal({name: "style"})
       done();
     })
@@ -182,10 +183,10 @@ describe("HtmlParser", function(){
         {text: "My App"},
         {name: "title"},
         {name: "style", data: {}},
-        {text: "\n      p {\n        margin: 0 auto;\n      }\n    "},
+        {text: `${EOL}      p {${EOL}        margin: 0 auto;${EOL}      }${EOL}    `},
         {name: "style"},
         {name: "script", data: {}},
-        {text: '\n      alert("Click me!")\n    '},
+        {text: `${EOL}      alert("Click me!")${EOL}    `},
         {name: "script"},
         {name: "head"},
         {name: "body", data: {}},
@@ -207,7 +208,7 @@ describe("HtmlParser", function(){
         {name: "p"},
         {name: "p"},
         {name: "!--", data: {}},
-        {text: " \n          hello \n          world \n        "},
+        {text: ` ${EOL}          hello ${EOL}          world ${EOL}        `},
         {name: "!--"},
         {text: "some actual text"},
         {name: "p"},
@@ -255,7 +256,7 @@ describe("HtmlParser", function(){
   describe("preserve whitespace option", () => {
     theyBothWithPreserveWSOption("should preserve whitespace in raw text", "text", true, function(res, done){
       expect(res.length).to.equal(1);
-      expect(res[0].text).to.contain("\n");
+      expect(res[0].text).to.contain(EOL);
       expect(res[0].text).to.contain("  ");
       done();
     })
@@ -263,77 +264,77 @@ describe("HtmlParser", function(){
       expect(res.length).to.equal(62)
       expect(res).to.eql([
         {name: "!DOCTYPE", data: {html: ""}},
-        {text: "\n"},
+        {text: EOL},
         {name: "html", data: {}},
-        {text: "\n  "},
+        {text: `${EOL}  `},
         {name: "head", data: {}},
-        {text: "\n    some actual text" },
+        {text: `${EOL}    some actual text` },
         {name: "!--", data: {} },
         {text: " broken link " },
         {name: "!--" },
-        {text: "\n    " },
+        {text: `${EOL}    ` },
         {name: "link", data: {rel: "stylesheet", type: "text/css", href: "mystyle.css"}},
-        {text: "\n    "},
+        {text: `${EOL}    `},
         {name: "meta", data: {name: "viewport", content: "width=device-width, initial-scale=1"}},
-        {text: "\n    "},
+        {text: `${EOL}    `},
         {name: 'title', data: {} },
-        {text: "\n      My App\n    "},
+        {text: `${EOL}      My App${EOL}    `},
         {name: "title" },
-        {text: "\n    "},
+        {text: `${EOL}    `},
         {name: "style", data: {}},
-        {text: "\n      p {\n        margin: 0 auto;\n      }\n    "},
+        {text: `${EOL}      p {${EOL}        margin: 0 auto;${EOL}      }${EOL}    `},
         {name: "style"},
-        {text: "\n    "},
+        {text: `${EOL}    `},
         {name: "script", data: {}},
-        {text: '\n      alert("Click me!")\n    '},
+        {text: `${EOL}      alert("Click me!")${EOL}    `},
         {name: "script"},
-        {text: "\n  "},
+        {text: `${EOL}  `},
         {name: "head"},
-        {text: "\n  "},
+        {text: `${EOL}  `},
         {name: 'body', data: {}},
-        {text: "\n    "},
+        {text: `${EOL}    `},
         {name: "h1", data: {style: "color:blue;margin-left:30px;"}},
         {text: "My Awesome App"},
         {name: "h1"},
-        {text: "\n    This\n    Is\n    My\n    Body\n    "},
+        {text: `${EOL}    This${EOL}    Is${EOL}    My${EOL}    Body${EOL}    `},
         {name: "p", data: {}},
         {text: "Paragraph 1"},
         {name: "p"},
-        {text: "\n    "},
+        {text: `${EOL}    `},
         {name: "p", data: {these: ""}},
-        {text: "Trees\n      "},
+        {text: `Trees${EOL}      `},
         {name: "p", data: {are: "definitely"}},
-        {text: "Are\n        "},
+        {text: `Are${EOL}        `},
         {name: "p", data: {invalid: ""}},
-        {text: 'Cool\n          ' },
+        {text: `Cool${EOL}          `},
         {name: "p", data: {attributes: "", on:"", our: "paragraph tags"}},
-        {text: 'Right?\n          ' },
+        {text: `Right?${EOL}          ` },
         {name: "p" },
-        {text: "\n        "},
+        {text: `${EOL}        `},
         {name: "p"},
-        {text: "\n        "},
+        {text: `${EOL}        `},
         {name: "!--", data: {}},
-        {text: " \n          hello \n          world \n        "},
+        {text: ` ${EOL}          hello ${EOL}          world ${EOL}        `},
         {name: "!--"},
-        {text: "some actual text\n      "},
+        {text: `some actual text${EOL}      `},
         {name: "p"},
-        {text: "\n    "},
+        {text: `${EOL}    `},
         {name: "p"},
-        {text: "\n  "},
+        {text: `${EOL}  `},
         {name: "body"},
-        {text: "\n"},
+        {text: EOL},
         {name: "html"},
-        {text: "\n"}
+        {text: EOL}
       ])
       done()
     })
     theyBothWithPreserveWSOption("should preserve all whitespace chars in text", "regular-ws", true, function(res, done){
       expect(res).to.eql([
-        {text: "Title:\t\n"},
+        {text: `Title:\t${EOL}`},
         {name: "b", data: {}},
-        {text: " Jan \t\n\t Bananberg"},
+        {text: ` Jan \t${EOL}\t Bananberg`},
         {name: "b"},
-        {text: "\n"}
+        {text: EOL}
       ])
       done();
     })
@@ -341,9 +342,9 @@ describe("HtmlParser", function(){
       expect(res).to.eql([
         {text: "        "},
         {name: "some-name", data: {}},
-        {text: " \n\n  "},
+        {text: ` ${EOL}${EOL}  `},
         {name: "some-name"},
-        {text: "\n\n"}
+        {text: `${EOL}${EOL}`}
       ]);
       done()
     })
