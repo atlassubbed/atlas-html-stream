@@ -1,6 +1,6 @@
 {
   "name": "atlas-html-stream",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A super fast html-parser stream that outputs tag, text and closing nodes.",
   "scripts": {
     "test-server": "mocha --colors --watch --recursive",
