@@ -80,22 +80,46 @@ describe("HtmlParser", function(){
       done();
     })
     theyBoth("should capture unquoted values as strings", "key-val", function(res, done){
-      res = res.filter(d => d.data);
-      expect(res.length).to.equal(1);
-      expect(res[0].data).to.deep.equal({
-        "some-key": "false",
-        "another-key": "24",
-        "a-key": "null"
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({
+        name: "name",
+        data: {
+          "some-key": "false",
+          "another-key": "24",
+          "a-key": "null",
+          "src": "/atlassubbed/atlas-html-stream/",
+        }
+      });
+      expect(res[1]).to.deep.equal({
+        name: "name",
+        data: {
+          "src": "/atlassubbed/atlas-html-stream",
+        }
+      });
+      expect(res[2]).to.deep.equal({
+        name: "name"
       });
       done();
     })
     theyBoth("should ignore malformatted whitespace around unquoted values", "key-val-ws", function(res, done){
-      res = res.filter(d => d.data);
-      expect(res.length).to.equal(1);
-      expect(res[0].data).to.deep.equal({
-        "some-key": "false",
-        "another-key": "24",
-        "a-key": "null"
+      expect(res.length).to.equal(3);
+      expect(res[0]).to.deep.equal({
+        name: "name",
+        data: {
+          "some-key": "false",
+          "another-key": "24",
+          "a-key": "null",
+          "src": "/atlassubbed/atlas-html-stream/",
+        }
+      });
+      expect(res[1]).to.deep.equal({
+        name: "name",
+        data: {
+          "src": "/atlassubbed/atlas-html-stream",
+        }
+      });
+      expect(res[2]).to.deep.equal({
+        name: "name"
       });
       done();
     })
