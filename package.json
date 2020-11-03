@@ -27,8 +27,7 @@
     "mocha": "^5.2.0"
   },
   "engines": {
-    "node": "^10.1.0",
-    "npm": "^6.0.1"
+    "node": ">=10.1.0"
   },
   "dependencies": {
     "atlas-seq-matcher": "^1.0.2"
