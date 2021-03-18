@@ -30,7 +30,7 @@
     "node": ">=10.1.0"
   },
   "dependencies": {
-    "atlas-seq-matcher": "git@github.com:BonnierNews/atlas-html-stream.git"
+    "atlas-seq-matcher": "git+https://github.com:BonnierNews/atlas-seq-matcher.git"
   },
   "homepage": "https://github.com/BonnierNews/atlas-html-stream#readme",
   "bugs": "https://github.com/BonnierNews/atlas-html-stream/issues",
