@@ -57,7 +57,7 @@ module.exports = class HtmlParser extends Transform {
         } else if (s === NODE){
           if (c === 62) // >
             key && flushKey(), s = flushNode(), v = i + 1
-          else if (c === 47) // /
+          else if (c === 47 && !hasEqual) // /
             isClose = !(isSelfClose = !!name)
           else if (c !== 32 && (c < 9 || c > 13)){ // !ws
             if (!name) // name start
@@ -99,8 +99,6 @@ module.exports = class HtmlParser extends Transform {
             flushVal(v,i), s = NODE, v = i + 1
           else if (c === 62) // >
             flushVal(v,i), s = flushNode(), v = i + 1
-          else if (c === 47) // /
-            isSelfClose = true, flushVal(v,i), s = NODE, v = i + 1
         } else if (s === COMMENT && endComment.found(c))
           s = flushSpecialNode(v, i-2, "!--"), v = i + 1
         else if (s === SCRIPT && endScript.found(c))
