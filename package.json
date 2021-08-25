@@ -1,6 +1,6 @@
 {
-  "name": "atlas-html-stream",
-  "version": "1.2.0",
+  "name": "@bonniernews/atlas-html-stream",
+  "version": "1.2.1",
   "description": "A super fast html-parser stream that outputs tag, text and closing nodes.",
   "scripts": {
     "test-server": "mocha --colors --watch --recursive",
@@ -30,7 +30,7 @@
     "node": ">=10.1.0"
   },
   "dependencies": {
-    "atlas-seq-matcher": "git+https://github.com/BonnierNews/atlas-seq-matcher.git"
+    "@bonniernews/atlas-seq-matcher": "^1.0.3"
   },
   "homepage": "https://github.com/BonnierNews/atlas-html-stream#readme",
   "bugs": "https://github.com/BonnierNews/atlas-html-stream/issues",
