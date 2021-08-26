@@ -1,6 +1,6 @@
 {
   "name": "@bonniernews/atlas-html-stream",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A super fast html-parser stream that outputs tag, text and closing nodes.",
   "scripts": {
     "test-server": "mocha --colors --watch --recursive",
