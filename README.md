@@ -1,15 +1,15 @@
 # atlas-html-stream
 
-A super fast html-parser stream that outputs tag, text and closing nodes.
+Fork of [atlas-html-stream](https://github.com/atlassubbed/atlas-html-stream) which is a super fast html-parser stream that outputs tag,
+text and closing nodes. See `CHANGELOG.md` for changes introduced in the fork.
 
-[![Travis](https://img.shields.io/travis/atlassubbed/atlas-html-stream.svg)](https://travis-ci.org/atlassubbed/atlas-html-stream)
+[![Travis](https://img.shields.io/travis/bonniernews/atlas-html-stream.svg)](https://travis-ci.org/bonniernews/atlas-html-stream)
 
 ---
-
 ## install 
 
 ```
-npm install --save atlas-html-stream
+npm install --save @bonniernews/atlas-html-stream
 ```
 
 ## why
@@ -48,7 +48,7 @@ The stream interface is recommended, because it allows you to consume a constant
 
 ```javascript
 const { createReadStream } = require("fs");
-const HtmlParser = require("atlas-html-stream");
+const HtmlParser = require("@bonniernews/atlas-html-stream");
 const myHtmlFile = createReadStream("./index.html");
 
 myHtmlFile.pipe(new HtmlParser()).on("data", ({name, data, text}) => {
@@ -74,7 +74,7 @@ This is not recommended unless you can afford to have your HTML exist entirely i
 
 ```javascript
 // helpers.js
-const HtmlParser = require("atlas-html-stream");
+const HtmlParser = require("@bonniernews/atlas-html-stream");
 const parser = new HtmlParser();
 
 const parseHtml = html => {

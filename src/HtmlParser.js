@@ -1,4 +1,4 @@
-const SeqMatcher = require("atlas-seq-matcher");
+const SeqMatcher = require("@bonniernews/atlas-seq-matcher");
 const { Transform } = require("stream");
 const { TEXT, NODE, NAME, KEY, VALUE, SCRIPT, STYLE, COMMENT } = require("./states");
 
