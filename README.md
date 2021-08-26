@@ -3,8 +3,6 @@
 Fork of [atlas-html-stream](https://github.com/atlassubbed/atlas-html-stream) which is a super fast html-parser stream that outputs tag,
 text and closing nodes. See `CHANGELOG.md` for changes introduced in the fork.
 
-[![Travis](https://img.shields.io/travis/bonniernews/atlas-html-stream.svg)](https://travis-ci.org/bonniernews/atlas-html-stream)
-
 ---
 ## install 
 
