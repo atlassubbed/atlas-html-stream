@@ -10,7 +10,7 @@ describe("HtmlParser", function(){
     const parser = new HtmlParser();
     expect(parser).to.be.an.instanceOf(Transform)
   })
-  describe("ignores trivial html files", function(done){
+  describe("ignores trivial html files", function(){
     it("should not capture any tokens from empty files", function(done){
       parse({name: "empty.html"}, (err, res) => {
         if (err) return done(err);
@@ -247,7 +247,7 @@ describe("HtmlParser", function(){
     it("should not flush pending text if the stream hasn't ended", function(){
       let calledData = 0;
       const parser = new HtmlParser();
-      parser.on("data", data => calledData++);
+      parser.on("data", () => calledData++);
       parser.write("some pending text");
       expect(calledData).to.equal(0);
     })
