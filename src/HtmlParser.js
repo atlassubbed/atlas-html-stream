@@ -73,114 +73,128 @@ module.exports = class HtmlParser extends Transform {
     let i = this.curPos, v = this.minPos, s = this.state, c;
     while (i < cacheLen) {
       c = cache.charCodeAt(i);
-      if (s === TEXT) {
-        if (!this.preserveWS && (c === 32 || c >= 9 && c <= 13)) { // ws
-          v < i && this.text.push(this.getCache(v, i));
-          v = i + 1;
-        } else if (c === 60) { // <
-          this.flushText(v, i);
-          s = NODE;
-          v = i + 1;
-        }
-      } else if (s === NODE) {
-        if (c === 62) { // >
-          this.key && this.flushKey();
-          s = this.flushNode();
-          v = i + 1;
-        } else if (c === 47 && !this.hasEqual) { // /
-          this.isClose = !(this.isSelfClose = !!this.name);
-        } else if (c !== 32 && (c < 9 || c > 13)) { // !ws
-          if (!this.name) { // name start
-            this.beginComment.found(c);
-            v = i;
-            s = NAME;
-          } else if (!this.key) { // key start
-            v = i;
-            s = KEY;
-          } else if (c === 61) { // =
-            this.hasEqual = true;
-          } else if (!this.hasEqual) { // next key
-            this.flushKey();
-            v = i;
-            s = KEY;
-          } else if (c === 34 || c === 39) { // ', "
+      switch (s) {
+        case TEXT: {
+          if (!this.preserveWS && (c === 32 || c >= 9 && c <= 13)) { // ws
+            v < i && this.text.push(cache.substring(v, i));
             v = i + 1;
-            this.valStartChar = c;
-            s = VALUE;
-          } else { // un-quoted val
-            v = i;
-            s = VALUE;
-          }
-        }
-      } else if (s === NAME) {
-        if (this.beginComment.found(c)) { // start comment
-          this.name = this.getCache(v, i + 1);
-          s = this.flushNode();
-          v = i + 1;
-        } else if (c === 32 || c >= 9 && c <= 13) { // ws
-          this.name = this.getCache(v, i);
-          s = NODE;
-          v = i + 1;
-        } else if (c === 47) { // /
-          this.isSelfClose = true;
-          this.name = this.getCache(v, i);
-          s = NODE;
-          v = i + 1;
-        } else if (c === 62) { // >
-          this.name = this.getCache(v, i);
-          s = this.flushNode();
-          v = i + 1;
-        }
-      } else if (s === KEY) {
-        if (c === 32 || c >= 9 && c <= 13) { // ws
-          this.key = this.getCache(v, i);
-          s = NODE;
-          v = i + 1;
-        } else if (c === 61) { // =
-          this.hasEqual = true;
-          this.key = this.getCache(v, i);
-          s = NODE;
-          v = i + 1;
-        } else if (c === 47) { // /
-          this.isSelfClose = true;
-          this.key = this.getCache(v, i);
-          s = NODE;
-          v = i + 1;
-        } else if (c === 62) { // >
-          this.flushKey(v, i);
-          s = this.flushNode();
-          v = i + 1;
-        }
-      } else if (s === VALUE) {
-        if (this.valStartChar !== null) {
-          if (c === this.valStartChar) { // found end quote
-            this.flushVal(v, i);
+          } else if (c === 60) { // <
+            this.flushText(v, i);
             s = NODE;
             v = i + 1;
           }
-        } else if (c === 32 || c >= 9 && c <= 13) { // ws
-          this.flushVal(v, i);
-          s = NODE;
-          v = i + 1;
-        } else if (c === 62) { // >
-          this.flushVal(v, i);
-          s = this.flushNode();
-          v = i + 1;
+          break;
         }
-      } else if (s === COMMENT && this.endComment.found(c)) {
-        s = this.flushSpecialNode(v, i - 2, "!--");
-        v = i + 1;
-      } else if (s === SCRIPT && this.endScript.found(c)) {
-        s = this.flushSpecialNode(v, i - 8, "script");
-        v = i + 1;
-      } else if (s === STYLE && this.endStyle.found(c)) {
-        s = this.flushSpecialNode(v, i - 7, "style");
-        v = i + 1;
+        case NODE: {
+          if (c === 62) { // >
+            this.key && this.flushKey();
+            s = this.flushNode();
+            v = i + 1;
+          } else if (c === 47 && !this.hasEqual) { // /
+            this.isClose = !(this.isSelfClose = !!this.name);
+          } else if (c !== 32 && (c < 9 || c > 13)) { // !ws
+            if (!this.name) { // name start
+              this.beginComment.found(c);
+              v = i;
+              s = NAME;
+            } else if (!this.key) { // key start
+              v = i;
+              s = KEY;
+            } else if (c === 61) { // =
+              this.hasEqual = true;
+            } else if (!this.hasEqual) { // next key
+              this.flushKey();
+              v = i;
+              s = KEY;
+            } else if (c === 34 || c === 39) { // ', "
+              v = i + 1;
+              this.valStartChar = c;
+              s = VALUE;
+            } else { // un-quoted val
+              v = i;
+              s = VALUE;
+            }
+          }
+          break;
+        }
+        case NAME: {
+          if (this.beginComment.found(c)) { // start comment
+            this.name = cache.substring(v, i + 1);
+            s = this.flushNode();
+            v = i + 1;
+          } else if (c === 32 || c >= 9 && c <= 13) { // ws
+            this.name = cache.substring(v, i);
+            s = NODE;
+            v = i + 1;
+          } else if (c === 47) { // /
+            this.isSelfClose = true;
+            this.name = cache.substring(v, i);
+            s = NODE;
+            v = i + 1;
+          } else if (c === 62) { // >
+            this.name = cache.substring(v, i);
+            s = this.flushNode();
+            v = i + 1;
+          }
+          break;
+        }
+        case KEY: {
+          if (c === 32 || c >= 9 && c <= 13) { // ws
+            this.key = cache.substring(v, i);
+            s = NODE;
+            v = i + 1;
+          } else if (c === 61) { // =
+            this.hasEqual = true;
+            this.key = cache.substring(v, i);
+            s = NODE;
+            v = i + 1;
+          } else if (c === 47) { // /
+            this.isSelfClose = true;
+            this.key = cache.substring(v, i);
+            s = NODE;
+            v = i + 1;
+          } else if (c === 62) { // >
+            this.flushKey(v, i);
+            s = this.flushNode();
+            v = i + 1;
+          }
+          break;
+        }
+        case VALUE: {
+          if (this.valStartChar !== null) {
+            if (c === this.valStartChar) { // found end quote
+              this.flushVal(v, i);
+              s = NODE;
+              v = i + 1;
+            }
+          } else if (c === 32 || c >= 9 && c <= 13) { // ws
+            this.flushVal(v, i);
+            s = NODE;
+            v = i + 1;
+          } else if (c === 62) { // >
+            this.flushVal(v, i);
+            s = this.flushNode();
+            v = i + 1;
+          }
+          break;
+        }
+        default: {
+          if (s === COMMENT && this.endComment.found(c)) {
+            s = this.flushSpecialNode(v, i - 2, "!--");
+            v = i + 1;
+          } else if (s === SCRIPT && this.endScript.found(c)) {
+            s = this.flushSpecialNode(v, i - 8, "script");
+            v = i + 1;
+          } else if (s === STYLE && this.endStyle.found(c)) {
+            s = this.flushSpecialNode(v, i - 7, "style");
+            v = i + 1;
+          }
+        }
       }
       i++;
     }
 
-    this.cache = this.cache.substring(v);
+    this.cache = cache.substring(v);
     this.curPos = i - v;
     this.minPos = 0;
     this.state = s;
@@ -191,9 +205,6 @@ module.exports = class HtmlParser extends Transform {
     this.flushText(this.minPos, this.curPos);
     this.reset();
     done(null);
-  }
-  getCache(start, end) {
-    return this.cache.substring(start, end);
   }
   flushKey(v, i) {
     return (this.key = this.data[this.key || this.cache.substring(v, i)] = "");
