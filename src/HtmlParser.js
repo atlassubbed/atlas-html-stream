@@ -38,9 +38,9 @@ module.exports = class HtmlParser extends Transform {
     this.text = [];
     this.data = {};
 
-    this.isClose = null;
-    this.isSelfClose = null;
-    this.hasEqual = null;
+    this.isClose = false;
+    this.isSelfClose = false;
+    this.hasEqual = false;
     this.valStartChar = null;
   }
   reset() {
@@ -59,14 +59,12 @@ module.exports = class HtmlParser extends Transform {
     this.text = [];
     this.data = {};
 
-    this.isClose = null;
-    this.isSelfClose = null;
-    this.hasEqual = null;
+    this.isClose = false;
+    this.isSelfClose = false;
+    this.hasEqual = false;
     this.valStartChar = null;
   }
   _transform(chunk, encoding, done){
-    if (chunk === null) return this.end();
-
     const cache = this.cache += chunk;
     const cacheLen = cache.length;
 
@@ -76,7 +74,7 @@ module.exports = class HtmlParser extends Transform {
       switch (s) {
         case TEXT: {
           if (!this.preserveWS && (c === 32 || c >= 9 && c <= 13)) { // ws
-            v < i && this.text.push(cache.substring(v, i));
+            if (v < i) this.text.push(cache.substring(v, i));
             v = i + 1;
           } else if (c === 60) { // <
             this.flushText(v, i);
@@ -87,7 +85,7 @@ module.exports = class HtmlParser extends Transform {
         }
         case NODE: {
           if (c === 62) { // >
-            this.key && this.flushKey();
+            if (this.key) this.flushKey();
             s = this.flushNode();
             v = i + 1;
           } else if (c === 47 && !this.hasEqual) { // /
@@ -207,10 +205,12 @@ module.exports = class HtmlParser extends Transform {
     done(null);
   }
   flushKey(v, i) {
-    return (this.key = this.data[this.key || this.cache.substring(v, i)] = "");
+    this.key = this.data[this.key || this.cache.substring(v, i)] = "";
   }
   flushVal(v, i) {
-    return (this.data[this.key] = this.cache.substring(v, i), this.key = "", this.valStartChar = this.hasEqual = null);
+    this.data[this.key] = this.cache.substring(v, i);
+    this.key = "";
+    this.valStartChar = this.hasEqual = null;
   }
   flushNode() {
     const name = this.name;
@@ -232,12 +232,13 @@ module.exports = class HtmlParser extends Transform {
     }
     this.data = {};
     this.name = "";
-    this.isClose = this.isSelfClose = null;
+    this.isClose = false;
+    this.isSelfClose = false;
     return s;
   }
   flushSpecialNode(v, i, name) {
     const text = this.cache.substring(v, i);
-    text && this.push({ text });
+    if (text) this.push({ text });
     this.push({ name });
     return TEXT;
   }
