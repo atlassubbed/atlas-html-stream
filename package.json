@@ -5,7 +5,8 @@
   "scripts": {
     "test-server": "mocha --colors --watch --recursive",
     "test": "mocha --colors --recursive",
-    "posttest": "eslint . --cache"
+    "posttest": "eslint . --cache",
+    "cov:html": "nyc mocha && nyc report --reporter=html"
   },
   "main": "./src/HtmlParser.js",
   "keywords": [
@@ -27,7 +28,8 @@
     "chai": "^4.3.4",
     "eslint": "^8.5.0",
     "eslint-config-exp": "0.0.9",
-    "mocha": "^9.1.3"
+    "mocha": "^9.1.3",
+    "nyc": "^15.1.0"
   },
   "engines": {
     "node": ">=10.1.0"

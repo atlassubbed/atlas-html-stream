@@ -175,6 +175,12 @@ describe("HtmlParser", () => {
       expect(res[2]).to.deep.equal({ name: "script" });
       done();
     });
+    theyBoth("should return empty script", "empty-script", (res, done) => {
+      expect(res.length).to.equal(2);
+      expect(res[0]).to.deep.equal({ name: "script", data: {} });
+      expect(res[1]).to.deep.equal({ name: "script" });
+      done();
+    });
   });
   describe("captures style nodes", () => {
     theyBoth("should treat everything inside the node as raw text", "style", (res, done) => {
@@ -189,6 +195,14 @@ describe("HtmlParser", () => {
       expect(res[0]).to.deep.equal({ name: "style", data: {} });
       expect(res[1].text).to.equal(`${EOL}  h1 {color:red;}${EOL}  p {color:blue;}${EOL}  <oops this=is not=valid css="!"/>${EOL}`);
       expect(res[2]).to.deep.equal({ name: "style" });
+      done();
+    });
+  });
+  describe("captures self close nodes", () => {
+    theyBoth("should close self closing nodes", "self-closing", (res, done) => {
+      expect(res.length).to.equal(2);
+      expect(res[0]).to.deep.equal({ name: "input", data: { id: "foo", disabled: "" } });
+      expect(res[1]).to.deep.equal({ name: "input" });
       done();
     });
   });

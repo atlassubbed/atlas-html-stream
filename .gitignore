@@ -1,8 +1,10 @@
+.DS_Store
+.eslintcache
+.nyc_output/
+*.log
+*.tgz
+coverage/
 node_modules/
 npm-debug.log
-.DS_Store
-tmp/
-*.log
-.eslintcache
-*.tgz
 package-lock.json
+tmp/
