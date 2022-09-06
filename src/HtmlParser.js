@@ -20,7 +20,7 @@ class SeqMatcher {
 }
 
 module.exports = class HtmlParser extends Transform {
-  constructor({ preserveWS } = {}){
+  constructor({ preserveWS } = {}) {
     super({ readableObjectMode: true });
     this.preserveWS = preserveWS;
     this.endScript = new SeqMatcher("</script>");
@@ -64,7 +64,7 @@ module.exports = class HtmlParser extends Transform {
     this.hasEqual = false;
     this.valStartChar = null;
   }
-  _transform(chunk, encoding, done){
+  _transform(chunk, encoding, done) {
     const cache = this.cache += chunk;
     const cacheLen = cache.length;
 
@@ -199,7 +199,7 @@ module.exports = class HtmlParser extends Transform {
 
     done(null);
   }
-  _flush(done){
+  _flush(done) {
     this.flushText(this.minPos, this.curPos);
     this.reset();
     done(null);

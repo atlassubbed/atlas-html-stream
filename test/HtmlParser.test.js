@@ -281,7 +281,7 @@ describe("HtmlParser", () => {
       let calledData = 0;
       const parser = new HtmlParser();
       parser.on("data", (data) => {
-        if (++calledData === 1){
+        if (++calledData === 1) {
           expect(data.text).to.equal("some text");
         } else {
           expect(data.name).to.equal("p");
