@@ -1,20 +1,21 @@
-# atlas-html-stream
+atlas-html-stream
+=================
 
-A super fast html-parser stream that outputs tag, text and closing nodes.
+[![Built latest](https://github.com/BonnierNews/atlas-html-stream/actions/workflows/build-latest.yaml/badge.svg)](https://github.com/BonnierNews/atlas-html-stream/actions/workflows/build-latest.yaml)
 
-[![Travis](https://img.shields.io/travis/atlassubbed/atlas-html-stream.svg)](https://travis-ci.org/atlassubbed/atlas-html-stream)
+Fork of [atlas-html-stream](https://github.com/atlassubbed/atlas-html-stream) which is a super fast html-parser stream that outputs tag,
+text and closing nodes. See `CHANGELOG.md` for changes introduced in the fork.
 
 ---
-
-## install 
+## install
 
 ```
-npm install --save atlas-html-stream
+npm install --save @bonniernews/atlas-html-stream
 ```
 
 ## why
 
-I didn't like htmlparser2's streaming API and I wanted an html parser that collpased text-node whitespace by default. I also wanted to see if I could write a faster parser. 
+I didn't like htmlparser2's streaming API and I wanted an html parser that collpased text-node whitespace by default. I also wanted to see if I could write a faster parser.
 
 ## performance
 
@@ -38,7 +39,7 @@ A simple parser requires the body to be in memory, which can be game-breaking if
 
 When the parser is done with the first chunk, it will recognize that it needs to hold onto `"<di"` and will only flush `"first chunk "` from memory. When the parser is done with the second chunk, it will flush everything from memory since there's no longer a pending node.
 
-## examples 
+## examples
 
 Using this parser is really easy since it `extends` the stream interface -- all you need to do is pipe or write HTML to it and listen to `"data"` events:
 
@@ -48,7 +49,7 @@ The stream interface is recommended, because it allows you to consume a constant
 
 ```javascript
 const { createReadStream } = require("fs");
-const HtmlParser = require("atlas-html-stream");
+const HtmlParser = require("@bonniernews/atlas-html-stream");
 const myHtmlFile = createReadStream("./index.html");
 
 myHtmlFile.pipe(new HtmlParser()).on("data", ({name, data, text}) => {
@@ -74,7 +75,7 @@ This is not recommended unless you can afford to have your HTML exist entirely i
 
 ```javascript
 // helpers.js
-const HtmlParser = require("atlas-html-stream");
+const HtmlParser = require("@bonniernews/atlas-html-stream");
 const parser = new HtmlParser();
 
 const parseHtml = html => {
@@ -126,9 +127,9 @@ Again, these are treated the same way.
 
 ```javascript
 const commentNodes = parseHtml(`
-  <!-- 
-    this is 
-    a comment 
+  <!--
+    this is
+    a comment
   -->
 `)
 commentNodes.forEach(n => console.log(n));
@@ -145,9 +146,9 @@ By default, the parser will collapse all non-script/style/comment whitespace dow
 const nodes = parseHtml(`
   This is some text
 
-      <b> 
+      <b>
         Hola
-          </b>  
+          </b>
 `)
 nodes.forEach(n => console.log(n));
 // { text: "\n  This is some text\n\n      " }
@@ -171,7 +172,7 @@ Should `parseHtml` be exported from this package in addition to `HtmlParser`? Us
 
 #### even faster
 
-I'd like to make this thing even faster. The parsing itself takes about `3.5 ms/file` (using [htmlparser-benchmark](https://github.com/AndreasMadsen/htmlparser-benchmark)) on my machine. Pushing nodes as `data` events to our stream adds around 40% more processing time, which is why the benchmark above shows around `4.9 ms/file` -- this can't be avoided, because we *want* the streaming interface. 
+I'd like to make this thing even faster. The parsing itself takes about `3.5 ms/file` (using [htmlparser-benchmark](https://github.com/AndreasMadsen/htmlparser-benchmark)) on my machine. Pushing nodes as `data` events to our stream adds around 40% more processing time, which is why the benchmark above shows around `4.9 ms/file` -- this can't be avoided, because we *want* the streaming interface.
 
 The `SeqMatcher` slows down this parser (checking comment, script and style nodes); there might be a faster way to handle these special nodes.
 

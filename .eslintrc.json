@@ -1,0 +1,11 @@
+{
+  "root": true,
+  "extends": ["eslint-config-exp"],
+  "rules": {
+    "array-bracket-spacing": 0,
+    "no-return-assign": 0,
+    "no-unused-expressions": 0,
+    "object-curly-newline": 0,
+    "object-curly-spacing": 0
+  }
+}

@@ -1,10 +1,12 @@
 {
-  "name": "atlas-html-stream",
-  "version": "1.2.0",
+  "name": "@bonniernews/atlas-html-stream",
+  "version": "2.0.1",
   "description": "A super fast html-parser stream that outputs tag, text and closing nodes.",
   "scripts": {
     "test-server": "mocha --colors --watch --recursive",
-    "test": "mocha --colors --recursive"
+    "test": "mocha --colors --recursive",
+    "posttest": "eslint . --cache",
+    "cov:html": "nyc mocha && nyc report --reporter=html"
   },
   "main": "./src/HtmlParser.js",
   "keywords": [
@@ -23,20 +25,22 @@
   "author": "atlassubbed <atlassubbed@gmail.com>",
   "license": "Apache-2.0",
   "devDependencies": {
-    "chai": "^4.1.2",
-    "mocha": "^5.2.0"
+    "chai": "^4.3.7",
+    "eslint": "^8.28.0",
+    "eslint-config-exp": "^0.4.0",
+    "mocha": "^10.1.0",
+    "nyc": "^15.1.0"
   },
   "engines": {
-    "node": "^10.1.0",
-    "npm": "^6.0.1"
+    "node": ">=10.1.0"
   },
-  "dependencies": {
-    "atlas-seq-matcher": "^1.0.2"
-  },
-  "homepage": "https://github.com/atlassubbed/atlas-html-stream#readme",
-  "bugs": "https://github.com/atlassubbed/atlas-html-stream/issues",
+  "homepage": "https://github.com/BonnierNews/atlas-html-stream#readme",
+  "bugs": "https://github.com/BonnierNews/atlas-html-stream/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atlassubbed/atlas-html-stream.git"
-  }
+    "url": "https://github.com/BonnierNews/atlas-html-stream.git"
+  },
+  "files": [
+    "src"
+  ]
 }
